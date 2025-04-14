@@ -15,7 +15,9 @@ import MainLayout from '../components/layouts/MainLayout';
 import Button from '../components/common/Button';
 import AnimatedCard from '../components/common/AnimatedCard';
 import { getProducts } from '../services/products';
-
+import fans from '../assets/fans.webp';
+import ac from '../assets/ac.jpg';
+import acs from '../assets/acs.jpg';
 // Animation variants
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -28,7 +30,7 @@ const staggerContainer = {
 };
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 10 },
   show: { 
     opacity: 1, 
     y: 0,
@@ -63,10 +65,9 @@ const HomePage = () => {
         
         // Set some sample categories (in a real app, these would come from the API)
         setCategories([
-          { id: 1, name: 'Birthday Gifts', image: '/assets/images/categories/birthday.jpg' },
-          { id: 2, name: 'Anniversary', image: '/assets/images/categories/anniversary.jpg' },
-          { id: 3, name: 'Corporate Gifts', image: '/assets/images/categories/corporate.jpg' },
-          { id: 4, name: 'Personalized', image: '/assets/images/categories/personalized.jpg' },
+          { id: 'fan', name: 'Fans', image: fans },
+          { id: 'air-conditioner', name: 'ACs', image: acs },
+          
         ]);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -123,8 +124,7 @@ const HomePage = () => {
             >
               <div className="relative w-full h-80 md:h-96 overflow-hidden rounded-lg shadow-xl">
                 <img
-                  src="/assets/images/hero-image.jpg"
-                  alt="Gift box with decorative ribbon"
+                  src={ac}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
@@ -205,7 +205,7 @@ const HomePage = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Explore By Occasion</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Explore By Categories</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Find the perfect gift for every celebration and special moment in life.
             </p>
@@ -213,26 +213,26 @@ const HomePage = () => {
           
           <motion.div
             variants={staggerContainer}
-            initial="hidden"
+            
             whileInView="show"
             viewport={{ once: true, amount: 0.1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
           >
             {categories.map((category, index) => (
               <motion.div
                 key={category.id}
                 variants={fadeInUp}
-                className="relative group overflow-hidden rounded-lg shadow-md h-64"
+                className="relative group overflow-hidden rounded-lg shadow-md h-84  "
               >
-                <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-50 transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-30  group-hover:bg-opacity-50 transition-all duration-300"></div>
                 <img
                   src={category.image}
                   alt={category.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <h3 className="text-xl text-white font-bold mb-2">{category.name}</h3>
+                  <div className="text-center text-white bg-[#660E36] rounded-lg p-4 ">
+                    <h3 className="text-xl font-bold mb-2">{category.name}</h3>
                     <Link 
                       to={`/products?category=${category.id}`}
                       className="inline-flex items-center text-white bg-[#660E36] bg-opacity-90 hover:bg-opacity-100 transition-colors px-4 py-2 rounded-full text-sm font-medium"
@@ -332,21 +332,21 @@ const HomePage = () => {
             <TestimonialCard
               name="Sarah Johnson"
               role="Regular Customer"
-              image="/assets/images/testimonials/person1.jpg"
+              image="https://picsum.photos/200"
               content="The birthday gift I ordered for my sister was absolutely perfect! The packaging was elegant and the delivery was right on time. I'll definitely be ordering from Zuvees again."
             />
             
             <TestimonialCard
               name="Michael Thompson"
               role="Corporate Client"
-              image="/assets/images/testimonials/person2.jpg"
+              image="https://picsum.photos/200"
               content="We ordered corporate gifts for our entire team during the holidays and everyone loved them. The personalization options made each gift feel special and thoughtful."
             />
             
             <TestimonialCard
               name="Emily Chen"
               role="First-time Customer"
-              image="/assets/images/testimonials/person3.jpg"
+              image="https://picsum.photos/200"
               content="I was skeptical about ordering gifts online, but Zuvees exceeded my expectations. The quality of the products is amazing and the customer service was outstanding."
             />
           </motion.div>
