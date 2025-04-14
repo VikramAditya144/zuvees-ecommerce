@@ -10,7 +10,7 @@ export const useCart = () => {
     setCart(prevCart => {
       // Check if item already exists in cart
       const existingItemIndex = prevCart.items.findIndex(
-        item => item.product._id === product._id && item.variant._id === variant._id
+        item => item.product.id === product.id && item.variant.id === variant.id
       );
 
       let updatedItems = [...prevCart.items];
@@ -54,7 +54,7 @@ export const useCart = () => {
 
     setCart(prevCart => {
       const updatedItems = prevCart.items.map(item => {
-        if (item.product._id === productId && item.variant._id === variantId) {
+        if (item.product.id === productId && item.variant._id === variantId) {
           return { ...item, quantity };
         }
         return item;
@@ -79,7 +79,7 @@ export const useCart = () => {
   const removeFromCart = (productId, variantId) => {
     setCart(prevCart => {
       const updatedItems = prevCart.items.filter(
-        item => !(item.product._id === productId && item.variant._id === variantId)
+        item => !(item.product.id === productId && item.variant.id === variantId)
       );
 
       // Calculate totals

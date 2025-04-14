@@ -29,10 +29,11 @@ const AdminProductForm = () => {
     images: [],
     variants: [
       {
-        color: { name: '', hexCode: '#000000' },
+        color: { name: '', code: '#000000' },
         size: '',
         price: 0,
-        stock: 0
+        stock: 0,
+        sku: '' // Added missing sku field
       }
     ],
     isActive: true
@@ -44,15 +45,8 @@ const AdminProductForm = () => {
   
   // Available categories (in a real app, these would come from an API)
   const categories = [
-    'Birthday Gifts',
-    'Anniversary',
-    'Corporate Gifts',
-    'Personalized',
-    'Wedding Gifts',
-    'Seasonal',
-    'Home & Living',
-    'Fashion',
-    'Jewelry'
+    'fan',
+    'air-conditioner'
   ];
   
   // Available sizes (in a real app, these would be dynamic based on product type)
@@ -130,10 +124,11 @@ const AdminProductForm = () => {
       variants: [
         ...prev.variants,
         {
-          color: { name: '', hexCode: '#000000' },
+          color: { name: '', code: '#000000' },
           size: '',
           price: 0,
-          stock: 0
+          stock: 0,
+          sku: '' // Added sku field
         }
       ]
     }));
@@ -150,6 +145,16 @@ const AdminProductForm = () => {
       ...prev,
       variants: prev.variants.filter((_, i) => i !== index)
     }));
+  };
+
+  // Generate SKU
+  const generateSku = (variant, index) => {
+    // Simple SKU generation logic - you might want to enhance this
+    const productCode = formData.name.substring(0, 3).toUpperCase();
+    const colorCode = variant.color.name.substring(0, 2).toUpperCase();
+    const sizeCode = variant.size.substring(0, 1).toUpperCase();
+    
+    return `${productCode}-${colorCode}-${sizeCode}-${index + 1}`;
   };
   
   // Handle image upload
@@ -201,6 +206,19 @@ const AdminProductForm = () => {
       if (variant.stock < 0) {
         newErrors[`variants[${index}].stock`] = 'Stock cannot be negative';
       }
+      if (!variant.sku.trim()) {
+        // Auto-generate SKU if missing
+        const sku = generateSku(variant, index);
+        setFormData(prev => {
+          const updatedVariants = [...prev.variants];
+          updatedVariants[index] = {
+            ...updatedVariants[index],
+            sku
+          };
+          return { ...prev, variants: updatedVariants };
+        });
+      }
+
     });
     
     setErrors(newErrors);
@@ -457,14 +475,14 @@ const AdminProductForm = () => {
                         <div className="flex items-center">
                           <input
                             type="color"
-                            value={variant.color.hexCode}
-                            onChange={(e) => handleVariantChange(index, 'color.hexCode', e.target.value)}
+                            value={variant.color.code}
+                            onChange={(e) => handleVariantChange(index, 'color.code', e.target.value)}
                             className="h-10 w-10 border-0 p-0 mr-2"
                           />
                           <input
                             type="text"
-                            value={variant.color.hexCode}
-                            onChange={(e) => handleVariantChange(index, 'color.hexCode', e.target.value)}
+                            value={variant.color.code}
+                            onChange={(e) => handleVariantChange(index, 'color.code', e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#660E36] focus:border-[#660E36]"
                           />
                         </div>
@@ -530,7 +548,37 @@ const AdminProductForm = () => {
                         )}
                       </div>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        SKU
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <div className="flex items-center">
+                        <input
+                          type="text"
+                          value={variant.sku}
+                          onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
+                          className={`w-full px-4 py-2 border ${errors[`variants[${index}].sku`] ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-[#660E36] focus:border-[#660E36]`}
+                          placeholder="Product SKU"
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleVariantChange(index, 'sku', generateSku(variant, index))}
+                          className="ml-2 whitespace-nowrap"
+                        >
+                          Generate SKU
+                        </Button>
+                      </div>
+                      {errors[`variants[${index}].sku`] && (
+                        <p className="mt-1 text-sm text-red-600">{errors[`variants[${index}].sku`]}</p>
+                      )}
+                    </div>
+                  
                   </div>
+
+                  
                 ))}
               </div>
             </div>

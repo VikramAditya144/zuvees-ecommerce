@@ -15,14 +15,15 @@ import OrderDetailPage from './pages/orders/OrderDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import AuthPage from './pages/auth/AuthPage';
 
-// env variable
-
-
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminRiders from './pages/admin/AdminRiders'; // New
+import AdminApprovedEmails from './pages/admin/AdminApprovedEmails'; // New
+import AdminSettings from './pages/admin/AdminSettings'; // New
+import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, role = null }) => {
@@ -37,15 +38,7 @@ const ProtectedRoute = ({ children, role = null }) => {
   }
   
   // Check if user has the required role
-  // console.log('zuvees-auth:', JSON.parse(localStorage.getItem('zuvees-auth')));
-  // console.log('User:', user);
-  // console.log('User Role:', user?.role);
-  // console.log('Required Role:', role);
-  // console.log('Is Authenticated:', isAuthenticated);
-
-
-  if (role && user?.role !== role) 
-  {
+  if (role && user?.role !== role) {
     return <Navigate to="/" replace />;
   }
   
@@ -137,6 +130,39 @@ const App = () => {
               element={
                 <ProtectedRoute role="admin">
                   <AdminOrders />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/orders/:id" 
+              element={
+                <ProtectedRoute role="admin">
+                  <AdminOrderDetail />
+                </ProtectedRoute>
+              } 
+            />
+            {/* New Admin Routes */}
+            <Route 
+              path="/admin/riders" 
+              element={
+                <ProtectedRoute role="admin">
+                  <AdminRiders />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/approved-emails" 
+              element={
+                <ProtectedRoute role="admin">
+                  <AdminApprovedEmails />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/settings" 
+              element={
+                <ProtectedRoute role="admin">
+                  <AdminSettings />
                 </ProtectedRoute>
               } 
             />

@@ -481,7 +481,7 @@ const AdminDashboard = () => {
               </Link>
               
               <Link 
-                to="/admin/users" 
+                to="/admin/approved-emails" 
                 className="flex flex-col items-center justify-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <UserIcon className="w-8 h-8 text-purple-600 mb-2" />
@@ -489,7 +489,7 @@ const AdminDashboard = () => {
               </Link>
               
               <Link 
-                to="/admin/settings" 
+                to="/admin/riders" 
                 className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <TruckIcon className="w-8 h-8 text-gray-600 mb-2" />

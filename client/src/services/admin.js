@@ -1,6 +1,9 @@
 // src/services/admin.js
 import api from './api';
 
+/**
+ * Dashboard
+ */
 export const getDashboardStats = async () => {
   try {
     const response = await api.get('/admin/dashboard');
@@ -10,10 +13,21 @@ export const getDashboardStats = async () => {
   }
 };
 
+/**
+ * Orders
+ */
 export const getAllOrders = async (params = {}) => {
-  console.log("Params: ", params);
   try {
     const response = await api.get('/admin/orders', { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getOrderById = async (id) => {
+  try {
+    const response = await api.get(`/orders/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -38,6 +52,9 @@ export const assignRiderToOrder = async (id, riderId) => {
   }
 };
 
+/**
+ * Approved Emails
+ */
 export const getApprovedEmails = async (params = {}) => {
   try {
     const response = await api.get('/admin/approved-emails', { params });
@@ -63,4 +80,20 @@ export const removeApprovedEmail = async (id) => {
   } catch (error) {
     throw error.response?.data || error;
   }
+};
+
+export default {
+  // Dashboard
+  getDashboardStats,
+  
+  // Orders
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus,
+  assignRiderToOrder,
+  
+  // Approved Emails
+  getApprovedEmails,
+  addApprovedEmail,
+  removeApprovedEmail
 };

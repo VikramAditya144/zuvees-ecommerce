@@ -16,7 +16,7 @@ import { useCart } from '../hooks/useCart';
 import { useAuth } from '../hooks/useAuth';
 
 const CartPage = () => {
-  const { cart, updateQuantity, removeFromCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [promoCode, setPromoCode] = useState('');
@@ -122,11 +122,11 @@ const CartPage = () => {
                       {/* Product Details */}
                       <div className="flex-1">
                         <div className="flex justify-between mb-2">
-                          <Link to={`/products/${item.product._id}`} className="text-lg font-medium text-gray-800 hover:text-[#660E36]">
+                          <Link to={`/products/${item.product.id}`} className="text-lg font-medium text-gray-800 hover:text-[#660E36]">
                             {item.product.name}
                           </Link>
                           <button
-                            onClick={() => removeFromCart(item.product._id, item.variant._id)}
+                            onClick={() => removeFromCart(item.product.id, item.variant.id)}
                             className="text-gray-400 hover:text-red-500"
                           >
                             <XMarkIcon className="w-5 h-5" />
@@ -156,7 +156,7 @@ const CartPage = () => {
                               max="10"
                               value={item.quantity}
                               onChange={(e) => updateQuantity(item.product._id, item.variant._id, parseInt(e.target.value) || 1)}
-                              className="w-10 h-8 border-t border-b border-gray-300 text-center text-sm"
+                              className="w-15 h-8 border-t border-b border-gray-300 text-center text-sm"
                             />
                             <button
                               onClick={() => updateQuantity(item.product._id, item.variant._id, item.quantity + 1)}
@@ -191,7 +191,7 @@ const CartPage = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate('/products')}
+                    onClick={() => {clearCart();  navigate('/products')}}
                     icon={<TrashIcon className="w-4 h-4" />}
                     iconPosition="left"
                     className="text-red-600 hover:text-red-700"

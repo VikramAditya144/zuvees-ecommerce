@@ -36,12 +36,12 @@ api.interceptors.request.use(
     let token = null;
     try {
       const authData = localStorage.getItem('zuvees-auth');
-      console.log("Auth Data: ", authData);
+      // console.log("Auth Data: ", authData);
       if (authData) {
         const parsedData = JSON.parse(authData);
-        console.log("Parsed Data: ", parsedData);
+        // console.log("Parsed Data: ", parsedData);
         token = parsedData.authState.token;
-        console.log("Token: ", token)
+        // console.log("Token: ", token)
       }
     } catch (error) {
       console.error('Error parsing auth data:', error);
@@ -50,7 +50,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       // For debugging
-      console.log('Token attached to request:', token);
+      // console.log('Token attached to request:', token);
     } else {
       console.warn('No token found, request will proceed without authentication');
     }

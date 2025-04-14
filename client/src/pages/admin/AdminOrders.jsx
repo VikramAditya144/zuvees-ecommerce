@@ -301,12 +301,12 @@ const AdminOrders = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#660E36] focus:border-[#660E36]"
                 >
                   <option value="">All Statuses</option>
-                  <option value="PENDING">Pending</option>
-                  <option value="PAID">Paid</option>
-                  <option value="SHIPPED">Shipped</option>
-                  <option value="DELIVERED">Delivered</option>
-                  <option value="UNDELIVERED">Undelivered</option>
-                  <option value="CANCELLED">Cancelled</option>
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="undelivered">Undelivered</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
               

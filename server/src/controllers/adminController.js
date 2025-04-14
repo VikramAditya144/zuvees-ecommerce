@@ -249,7 +249,7 @@ exports.removeApprovedEmail = async (req, res, next) => {
       );
     }
     
-    await approvedEmail.remove();
+    await approvedEmail.deleteOne();
     
     res.status(200).json(
       createResponse(true, 'Approved email removed successfully')

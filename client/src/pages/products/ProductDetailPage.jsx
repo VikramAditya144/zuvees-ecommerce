@@ -10,14 +10,15 @@ import {
   CheckIcon,
   TruckIcon,
   CurrencyDollarIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  CreditCardIcon
 } from '@heroicons/react/24/outline';
 
 import MainLayout from '../../components/layouts/MainLayout';
 import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import Notification from '../../components/common/Notification';
-import { getProductById } from '../../services/products';
+import { getProductById, getProducts } from '../../services/products';
 import { useCart } from '../../hooks/useCart';
 
 const ProductDetailPage = () => {
@@ -118,18 +119,24 @@ const ProductDetailPage = () => {
     }, 3000);
   };
   
-  // Get available colors and sizes
+  // Get available colors - FIXED
   const getAvailableColors = () => {
     if (!product || !product.variants) return [];
     
-    const colors = new Set();
+    // Use a Map to get unique colors with their properties
+    const colorsMap = new Map();
     product.variants.forEach(variant => {
-      colors.add(variant.color.name);
+      // Use the color name as the key to ensure uniqueness
+      if (!colorsMap.has(variant.color.name)) {
+        colorsMap.set(variant.color.name, variant.color);
+      }
     });
     
-    return Array.from(colors);
+    // Convert the map values back to an array
+    return Array.from(colorsMap.values());
   };
   
+  // Get available sizes - FIXED
   const getAvailableSizes = () => {
     if (!product || !product.variants) return [];
     
@@ -145,11 +152,11 @@ const ProductDetailPage = () => {
   };
   
   // Check if a variant is available
-  const isVariantAvailable = (color, size) => {
+  const isVariantAvailable = (colorName, size) => {
     if (!product || !product.variants) return false;
     
     const variant = product.variants.find(
-      v => v.color.name === color && v.size === size
+      v => v.color.name === colorName && v.size === size
     );
     
     return variant && variant.stock > 0;
@@ -257,7 +264,7 @@ const ProductDetailPage = () => {
                 ))}
               </div>
               <span className="text-sm text-gray-500">
-                {product.reviewCount || 0} reviews
+                {product.numReviews || 0} reviews
               </span>
             </div>
             
@@ -279,32 +286,31 @@ const ProductDetailPage = () => {
               </div>
             </div>
             
-            {/* Colors */}
+            {/* Colors - FIXED */}
             <div className="mb-6">
               <h3 className="text-sm font-medium text-gray-700 mb-2">Color</h3>
               <div className="flex space-x-2">
                 {getAvailableColors().map(color => (
                   <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
+                    key={color.name}
+                    onClick={() => setSelectedColor(color.name)}
                     className={`w-10 h-10 rounded-full border-2 ${
-                      selectedColor === color 
+                      selectedColor === color.name 
                         ? 'border-[#660E36]' 
                         : 'border-transparent hover:border-gray-300'
                     }`}
-                    title={color}
-                    disabled={!isVariantAvailable(color, selectedSize)}
+                    title={color.name}
                   >
                     <span 
                       className="block w-full h-full rounded-full" 
-                      style={{ backgroundColor: product.variants.find(v => v.color.name === color)?.color.hexCode || '#ccc' }}
+                      style={{ backgroundColor: color.code || '#ccc' }}
                     />
                   </button>
                 ))}
               </div>
             </div>
             
-            {/* Sizes */}
+            {/* Sizes - FIXED */}
             <div className="mb-6">
               <h3 className="text-sm font-medium text-gray-700 mb-2">Size</h3>
               <div className="flex flex-wrap gap-2">
@@ -369,11 +375,12 @@ const ProductDetailPage = () => {
               
               <Button
                 variant="secondary"
-                icon={<HeartIcon className="w-5 h-5" />}
+                onClick={()=> {navigate('/cart')}}
+                icon={<CreditCardIcon className="w-5 h-5" />}
                 iconPosition="left"
                 fullWidth
               >
-                Add to Wishlist
+                Buy Now
               </Button>
             </div>
           </motion.div>
@@ -422,7 +429,7 @@ const ProductDetailPage = () => {
         {/* Related Products */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
-          <RelatedProducts productId={product._id} />
+          <RelatedProducts productId={product.id} />
         </div>
       </div>
       
@@ -474,7 +481,7 @@ const Tabs = ({ product }) => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Reviews ({product.reviewCount || 0})
+            Reviews ({product.numReviews || 0})
           </button>
         </nav>
       </div>
@@ -510,26 +517,36 @@ const Tabs = ({ product }) => {
               <h3 className="font-semibold mb-3">Product Information</h3>
               <table className="w-full text-sm">
                 <tbody>
-                  <tr className="border-b border-gray-200">
-                    <td className="py-2 font-medium text-gray-600">Material</td>
-                    <td className="py-2 text-gray-700">{product.material || 'Not specified'}</td>
-                  </tr>
-                  <tr className="border-b border-gray-200">
-                    <td className="py-2 font-medium text-gray-600">Dimensions</td>
-                    <td className="py-2 text-gray-700">{product.dimensions || 'Not specified'}</td>
-                  </tr>
-                  <tr className="border-b border-gray-200">
-                    <td className="py-2 font-medium text-gray-600">Weight</td>
-                    <td className="py-2 text-gray-700">{product.weight || 'Not specified'}</td>
-                  </tr>
-                  <tr className="border-b border-gray-200">
-                    <td className="py-2 font-medium text-gray-600">Category</td>
-                    <td className="py-2 text-gray-700">{product.category}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 font-medium text-gray-600">SKU</td>
-                    <td className="py-2 text-gray-700">{product.sku || 'Not specified'}</td>
-                  </tr>
+                  {product.specifications && Object.entries(product.specifications).map(([key, value]) => (
+                    <tr key={key} className="border-b border-gray-200">
+                      <td className="py-2 font-medium text-gray-600">{key}</td>
+                      <td className="py-2 text-gray-700">{value}</td>
+                    </tr>
+                  ))}
+                  {!product.specifications && (
+                    <>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 font-medium text-gray-600">Material</td>
+                        <td className="py-2 text-gray-700">{product.material || 'Not specified'}</td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 font-medium text-gray-600">Dimensions</td>
+                        <td className="py-2 text-gray-700">{product.dimensions || 'Not specified'}</td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 font-medium text-gray-600">Weight</td>
+                        <td className="py-2 text-gray-700">{product.weight || 'Not specified'}</td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 font-medium text-gray-600">Category</td>
+                        <td className="py-2 text-gray-700">{product.category}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-medium text-gray-600">SKU</td>
+                        <td className="py-2 text-gray-700">{selectedVariant?.sku || 'Not specified'}</td>
+                      </tr>
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -538,7 +555,7 @@ const Tabs = ({ product }) => {
         
         {activeTab === 'reviews' && (
           <div>
-            {product.reviewCount && product.reviewCount > 0 ? (
+            {product.numReviews && product.numReviews > 0 ? (
               <div>
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
@@ -550,7 +567,7 @@ const Tabs = ({ product }) => {
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600">Based on {product.reviewCount} reviews</span>
+                    <span className="text-sm text-gray-600">Based on {product.numReviews} reviews</span>
                   </div>
                 </div>
                 
@@ -625,6 +642,18 @@ const ReviewItem = ({ name, date, rating, content }) => {
   );
 };
 
+// AnimatedCard Component
+const AnimatedCard = ({ children, className }) => {
+  return (
+    <motion.div 
+      whileHover={{ y: -5 }}
+      className={`bg-white rounded-lg shadow-md overflow-hidden ${className || ''}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 // RelatedProducts Component
 const RelatedProducts = ({ productId }) => {
   const [products, setProducts] = useState([]);
@@ -639,8 +668,10 @@ const RelatedProducts = ({ productId }) => {
         const response = await getProducts({ limit: 4 });
         
         // Filter out the current product
-        const filteredProducts = response.data.filter(p => p._id !== productId);
-        setProducts(filteredProducts.slice(0, 4)); // Take up to 4 products
+        if (response.success) {
+          const filteredProducts = response.data.filter(p => p.id !== productId);
+          setProducts(filteredProducts.slice(0, 4)); // Take up to 4 products
+        }
       } catch (error) {
         console.error('Error fetching related products:', error);
       } finally {
@@ -655,10 +686,14 @@ const RelatedProducts = ({ productId }) => {
     return <Loader />;
   }
   
+  if (!products || products.length === 0) {
+    return <p className="text-center text-gray-500">No related products found</p>;
+  }
+  
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {products.map(product => (
-        <Link key={product._id} to={`/products/${product._id}`}>
+        <Link key={product.id} to={`/products/${product.id}`}>
           <AnimatedCard className="h-full">
             <div className="relative h-48 overflow-hidden">
               <img
@@ -673,7 +708,9 @@ const RelatedProducts = ({ productId }) => {
               <p className="text-gray-500 text-sm mb-2">{product.category}</p>
               
               <div className="mt-auto text-[#660E36] font-bold">
-                ${product.variants[0].price.toFixed(2)}
+                ${product.variants && product.variants.length > 0 ? 
+                  product.variants[0].price.toFixed(2) : 
+                  product.basePrice ? product.basePrice.toFixed(2) : 'N/A'}
               </div>
             </div>
           </AnimatedCard>

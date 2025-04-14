@@ -1,255 +1,189 @@
 // src/components/layouts/AdminLayout.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
+import { 
+  ChartBarIcon, 
+  ShoppingBagIcon, 
+  UserIcon,
+  Cog6ToothIcon,
+  ArrowLeftOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  HomeIcon,
-  ShoppingBagIcon,
-  UsersIcon,
-  ChartBarIcon,
-  CogIcon,
-  ArrowLeftOnRectangleIcon,
-  GiftIcon,
-  UserCircleIcon,
+  ShoppingCartIcon,
+  TruckIcon,
   EnvelopeIcon
 } from '@heroicons/react/24/outline';
 
-import Logo from '../common/Logo';
-import { useAuth } from '../../hooks/useAuth';
-
-const navItems = [
-  { path: '/admin/dashboard', label: 'Dashboard', icon: <HomeIcon className="w-5 h-5" /> },
-  { path: '/admin/products', label: 'Products', icon: <GiftIcon className="w-5 h-5" /> },
-  { path: '/admin/orders', label: 'Orders', icon: <ShoppingBagIcon className="w-5 h-5" /> },
-  { path: '/admin/users', label: 'Users', icon: <UsersIcon className="w-5 h-5" /> },
-  { path: '/admin/analytics', label: 'Analytics', icon: <ChartBarIcon className="w-5 h-5" /> },
-  { path: '/admin/settings', label: 'Settings', icon: <CogIcon className="w-5 h-5" /> },
-];
-
 const AdminLayout = ({ children }) => {
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Get current user from localStorage
+  const user = JSON.parse(localStorage.getItem('zuvees-auth') || '{}')?.authState?.user;
   
-  // Check if user is authenticated and is an admin
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth', { state: { redirectTo: location.pathname } });
-      return;
+  // Navigation items
+  const navItems = [
+    {
+      name: 'Dashboard',
+      path: '/admin/dashboard',
+      icon: <ChartBarIcon className="w-5 h-5" />
+    },
+    {
+      name: 'Orders',
+      path: '/admin/orders',
+      icon: <ShoppingBagIcon className="w-5 h-5" />
+    },
+    {
+      name: 'Products',
+      path: '/admin/products',
+      icon: <ShoppingCartIcon className="w-5 h-5" />
+    },
+    {
+      name: 'Riders',
+      path: '/admin/riders',
+      icon: <TruckIcon className="w-5 h-5" />
+    },
+    {
+      name: 'Approved Emails',
+      path: '/admin/approved-emails',
+      icon: <EnvelopeIcon className="w-5 h-5" />
+    },
+    {
+      name: 'Settings',
+      path: '/admin/settings',
+      icon: <Cog6ToothIcon className="w-5 h-5" />
     }
-    
-    if (user && user.role !== 'admin') {
-      navigate('/');
-    }
-  }, [isAuthenticated, user, navigate, location.pathname]);
-  
-  // Close sidebar when location changes
-  useEffect(() => {
-    setIsSidebarOpen(false);
-  }, [location.pathname]);
+  ];
   
   // Handle logout
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('zuvees-auth');
     navigate('/auth');
   };
   
-  // Toggle sidebar
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  // Close sidebar when clicking outside on mobile
+  const handleOverlayClick = () => {
+    setSidebarOpen(false);
   };
   
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar - Desktop */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        <div className="flex flex-col w-64 bg-[#660E36] text-white">
-          {/* Logo */}
-          <div className="flex items-center justify-center h-16 px-4 border-b border-[#7a2a4f]">
-            <Link to="/admin/dashboard" className="flex items-center">
-              <Logo className="h-8 w-8" />
-              <span className="ml-2 text-xl font-bold">Zuvees Admin</span>
-            </Link>
-          </div>
-          
-          {/* Nav Items */}
-          <div className="flex-1 overflow-y-auto py-4">
-            <nav className="px-2 space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === item.path 
-                      ? 'bg-[#4d0a28] text-white' 
-                      : 'text-white hover:bg-[#7a2a4f]'
-                  }`}
-                >
-                  <span className="mr-3">{item.icon}</span>
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          
-          {/* User Info */}
-          <div className="p-4 border-t border-[#7a2a4f]">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                {user?.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt={user.name}
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <UserCircleIcon className="h-8 w-8 text-white" />
-                )}
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium">{user?.name || 'Admin User'}</p>
-                <p className="text-xs text-gray-300">{user?.email || 'admin@example.com'}</p>
-              </div>
-            </div>
-            
-            <button
-              onClick={handleLogout}
-              className="mt-4 flex items-center w-full px-4 py-2 text-sm text-white rounded-md hover:bg-[#7a2a4f] transition-colors"
-            >
-              <ArrowLeftOnRectangleIcon className="mr-3 h-5 w-5" />
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      {/* Sidebar overlay (mobile) */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden" 
+          onClick={handleOverlayClick}
+        ></div>
+      )}
       
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 md:hidden bg-black bg-opacity-50"
-            onClick={() => setIsSidebarOpen(false)}
+      {/* Sidebar */}
+      <aside 
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      >
+        {/* Logo */}
+        <div className="p-4 border-b border-gray-200">
+          <Link to="/admin/dashboard" className="flex items-center">
+            {/* Replace with your actual logo */}
+            <div className="h-8 w-8 rounded-md bg-[#660E36] flex items-center justify-center text-white font-bold text-lg">
+              Z
+            </div>
+            <span className="ml-2 text-xl font-semibold text-gray-900">Zuvees Admin</span>
+          </Link>
+          
+          {/* Close button (mobile only) */}
+          <button 
+            className="absolute right-4 top-4 md:hidden"
+            onClick={() => setSidebarOpen(false)}
           >
-            <motion.div
-              initial={{ x: -260 }}
-              animate={{ x: 0 }}
-              exit={{ x: -260 }}
-              transition={{ type: 'tween' }}
-              className="fixed inset-y-0 left-0 w-64 bg-[#660E36] text-white flex flex-col"
-              onClick={(e) => e.stopPropagation()}
+            <XMarkIcon className="w-6 h-6 text-gray-500" />
+          </button>
+        </div>
+        
+        {/* Navigation */}
+        <nav className="p-4 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                location.pathname === item.path
+                  ? 'bg-[#660E36] text-white'
+                  : 'text-gray-700 hover:bg-pink-50 hover:text-[#660E36]'
+              }`}
             >
-              {/* Logo */}
-              <div className="flex items-center justify-between h-16 px-4 border-b border-[#7a2a4f]">
-                <Link to="/admin/dashboard" className="flex items-center">
-                  <Logo className="h-8 w-8" />
-                  <span className="ml-2 text-xl font-bold">Zuvees Admin</span>
-                </Link>
-                <button onClick={() => setIsSidebarOpen(false)}>
-                  <XMarkIcon className="h-6 w-6 text-white" />
-                </button>
-              </div>
-              
-              {/* Nav Items */}
-              <div className="flex-1 overflow-y-auto py-4">
-                <nav className="px-2 space-y-1">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        location.pathname === item.path 
-                          ? 'bg-[#4d0a28] text-white' 
-                          : 'text-white hover:bg-[#7a2a4f]'
-                      }`}
-                    >
-                      <span className="mr-3">{item.icon}</span>
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-              
-              {/* User Info */}
-              <div className="p-4 border-t border-[#7a2a4f]">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    {user?.profilePicture ? (
-                      <img
-                        src={user.profilePicture}
-                        alt={user.name}
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <UserCircleIcon className="h-8 w-8 text-white" />
-                    )}
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium">{user?.name || 'Admin User'}</p>
-                    <p className="text-xs text-gray-300">{user?.email || 'admin@example.com'}</p>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={handleLogout}
-                  className="mt-4 flex items-center w-full px-4 py-2 text-sm text-white rounded-md hover:bg-[#7a2a4f] transition-colors"
-                >
-                  <ArrowLeftOnRectangleIcon className="mr-3 h-5 w-5" />
-                  Sign Out
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <span className="mr-3">{item.icon}</span>
+              <span>{item.name}</span>
+            </Link>
+          ))}
+        </nav>
+        
+        {/* Admin Info */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+          <div className="flex items-center mb-4">
+            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+              {user?.profilePicture ? (
+                <img 
+                  src={user.profilePicture} 
+                  alt={user.name} 
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              ) : (
+                <UserIcon className="h-5 w-5 text-gray-500" />
+              )}
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-900">{user?.name || 'Admin User'}</p>
+              <p className="text-xs text-gray-500">{user?.email || 'admin@example.com'}</p>
+            </div>
+          </div>
+          
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <ArrowLeftOnRectangleIcon className="w-4 h-4 mr-2" />
+            Logout
+          </button>
+        </div>
+      </aside>
       
       {/* Main Content */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Top Header */}
-        <header className="bg-white shadow-sm z-10">
-          <div className="flex items-center justify-between h-16 px-4 md:px-6">
-            <div className="flex items-center">
-              {/* Mobile menu button */}
-              <button 
-                onClick={toggleSidebar}
-                className="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none"
-              >
-                <Bars3Icon className="h-6 w-6" />
-              </button>
-              
-              <div className="ml-4 md:ml-0">
-                <h1 className="text-lg font-semibold">
-                  {navItems.find(item => item.path === location.pathname)?.label || 'Admin Panel'}
-                </h1>
-              </div>
-            </div>
+      <div className="md:pl-64">
+        {/* Header */}
+        <header className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="px-4 py-4 flex items-center justify-between">
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Bars3Icon className="w-6 h-6 text-gray-700" />
+            </button>
             
-            <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <button className="text-gray-500 hover:text-gray-700 focus:outline-none">
-                <EnvelopeIcon className="h-6 w-6" />
-              </button>
-              
-              {/* User Menu - Mobile */}
-              <div className="md:hidden">
-                <button className="text-gray-500 hover:text-gray-700 focus:outline-none">
-                  <UserCircleIcon className="h-6 w-6" />
-                </button>
-              </div>
+            {/* Page Title - would be dynamic in a real app */}
+            <h1 className="text-lg font-semibold text-gray-900 md:hidden">
+              {navItems.find(item => item.path === location.pathname)?.name || 'Admin'}
+            </h1>
+            
+            {/* Right Side - could include notifications, profile dropdown, etc. */}
+            <div>
+              {/* Placeholder for potential header elements */}
             </div>
           </div>
         </header>
         
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6">
+        {/* Main Content */}
+        <main className="p-6">
           {children}
         </main>
+        
+        {/* Footer */}
+        <footer className="bg-white p-4 border-t border-gray-200 text-center text-sm text-gray-500">
+          &copy; {new Date().getFullYear()} Zuvees. All rights reserved.
+        </footer>
       </div>
     </div>
   );

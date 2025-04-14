@@ -65,10 +65,8 @@ const ProductsPage = () => {
   // Categories (in a real app, these would come from an API)
   const categories = [
     { id: '', name: 'All Categories' },
-    { id: '1', name: 'Birthday Gifts' },
-    { id: '2', name: 'Anniversary' },
-    { id: '3', name: 'Corporate Gifts' },
-    { id: '4', name: 'Personalized' }
+    { id: 'fan', name: 'Fan' },
+    { id: 'air-conditioner', name: 'Air Conditioner' },
   ];
   
   // Fetch products
@@ -309,7 +307,7 @@ const ProductsPage = () => {
           >
             {products.map((product, index) => (
               <ProductCard 
-                key={product._id} 
+                key={product.id} 
                 product={product} 
                 onAddToCart={() => handleAddToCart(product)}
               />
