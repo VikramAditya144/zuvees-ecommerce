@@ -24,6 +24,7 @@ import AdminRiders from './pages/admin/AdminRiders'; // New
 import AdminApprovedEmails from './pages/admin/AdminApprovedEmails'; // New
 import AdminSettings from './pages/admin/AdminSettings'; // New
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
+import ContactPage from './pages/ContactPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, role = null }) => {
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             
             {/* Protected Customer Routes */}
             <Route 
