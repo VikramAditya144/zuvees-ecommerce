@@ -2,6 +2,8 @@
 
 # Note: It is a basic doc advance is in respective server, client & PWA folders
 
+#Loom Video Link: https://www.loom.com/share/f3853484176f43d3b73decc667996f83
+
 A complete e-commerce solution for fans and air conditioners with multi-user roles, variant-based products, and delivery tracking.
 
 ## Live Deployments
