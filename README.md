@@ -1,6 +1,6 @@
 # Zuvees E-Commerce Platform
 
-# Note: It is a basic doc advance is in repective server, client & PWA folders
+# Note: It is a basic doc advance is in respective server, client & PWA folders
 
 A complete e-commerce solution for fans and air conditioners with multi-user roles, variant-based products, and delivery tracking.
 
